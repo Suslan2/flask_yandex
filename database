@@ -74,3 +74,11 @@ def like_news(news_id):
     cursor.execute("UPDATE news SET likes = likes + 1 WHERE id = ?", (news_id,))
     conn.commit()
     conn.close()
+
+def select_news():
+    conn = sqlite3.connect("news.db")
+    cursor = conn.cursor()
+    s = cursor.execute("SELECT author, content FROM news").fetchall()
+    conn.commit()
+    conn.close()
+    return s
