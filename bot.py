@@ -1,7 +1,7 @@
 import telebot
 import json
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from database import add_news, approve_news, reject_news, init_db
+from database import add_news, get_approve_news, reject_news, init_db
 
 init_db()
 
