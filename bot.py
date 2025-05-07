@@ -2,6 +2,7 @@ import telebot
 import json
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import add_news, get_approve_news, reject_news, init_db
+import datetime as dt
 
 init_db()
 
@@ -19,7 +20,8 @@ def start(message):
 
 @bot.message_handler(func=lambda m: True)
 def receive_news(message):
-    news_id = add_news(message.from_user.username, message.text)
+    data = dt.datetime.now().strftime("%d-%m-%y %H:%M")
+    news_id = add_news(message.from_user.username, message.text, data)
     pending_news[news_id] = message.from_user.id
 
     markup = InlineKeyboardMarkup()
@@ -47,7 +49,7 @@ def handle_moderation(call):
     user_id = pending_news.get(news_id)
 
     if action == "accept":
-        approve_news(news_id)
+        get_approve_news(news_id)
 
         t = {'title':text, 'content': au}
         with open("news.json", "rt", encoding="utf8") as f:
@@ -61,6 +63,7 @@ def handle_moderation(call):
         markup.add(InlineKeyboardButton("📎 Перейти к новости", url=SITE_URL))
 
         bot.send_message(user_id, "🎉 Ваша новость одобрена и опубликована!", reply_markup=markup)
+
     else:
         reject_news(news_id)
         bot.send_message(user_id, "❌ Ваша новость отклонена модератором.")
