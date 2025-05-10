@@ -43,6 +43,10 @@
             margin-bottom: 20px;
             border-radius: 8px;
         }
+        .highlighted {
+            background-color: #fff3cd !important;
+            transition: background-color 1s ease;
+        }
         .meta-row {
             display: flex;
             justify-content: space-between;
@@ -78,8 +82,10 @@
                 <h5>Свежие</h5>
                 {% for news in fresh %}
                 <div class="mb-2">
-                    <h6>{{ news[2] }}</h6>
-                    <small class="text-muted">{{ news[2][:50] }}...</small>
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">@{{ news[1] }}</small>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -87,11 +93,13 @@
 
         <div class="col-md-4">
             <div class="section-block">
-                <h5>Популярные</h5>
+                <h5>Закладки</h5>
                 {% for news in popular %}
                 <div class="mb-2">
-                    <h6>{{ news[2] }}</h6>
-                    <small class="text-muted">❤️ {{ news[4] }}</small>
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">@{{ news[1] }}</small>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -102,8 +110,10 @@
                 <h5>Обсуждаемые</h5>
                 {% for news in discussed %}
                 <div class="mb-2">
-                    <h6>{{ news[2] }}</h6>
-                    <small class="text-muted">💬 {{ news[5] }}</small>
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">💬 {{ news[5] }}</small>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -112,20 +122,20 @@
 
     <form class="search-box">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Поиск по новостям..." name="q" value="{{ search_query }}">
+            <input type="text" class="form-control" placeholder="Поиск по новостям..." name="q"
+                   value="{{ search_query }}">
             <button class="btn btn-outline-secondary" type="submit">Найти</button>
         </div>
     </form>
 
     {% for news in all_news %}
-    <div class="news-item">
+    <div class="news-item" id="news-{{ news[0] }}">
         <h3>{{ news[2] }}</h3>
-        <p>{{ news[3] }}</p>
 
         <div class="meta-row">
             <div class="action-buttons">
-                <form action="/like/{{ news[0] }}" method="POST" class="inline-form">
-                    <button type="submit" class="like-btn">❤️ {{ news[5] }}</button>
+                <form action="/bookmark/{{ news[0] }}" method="POST" class="inline-form">
+                    <button type="submit" class="like-btn">🔖 В закладки</button>
                 </form>
 
                 <button class="comment-toggle" onclick="toggleComments({{ news[0] }})">
@@ -135,6 +145,7 @@
 
             <div class="author-info">
                 Автор: <strong>@{{ news[1] }}</strong>
+                <span class="text-muted" style="font-size: 0.9em;"> | ⏰ {{ news[4] }}</span>
             </div>
         </div>
 
@@ -161,6 +172,18 @@
             commentsDiv.style.display = commentsDiv.style.display === 'none' ? 'block' : 'none';
         }
     }
+
+    window.onload = function () {
+        const hash = window.location.hash;
+        if (hash.startsWith("#news-")) {
+            const target = document.querySelector(hash);
+            if (target) {
+                target.classList.add("highlighted");
+                setTimeout(() => target.classList.remove("highlighted"), 2000);
+                target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    };
 </script>
 </body>
 </html>
