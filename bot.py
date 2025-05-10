@@ -2,9 +2,13 @@ import telebot
 import json
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import add_news, get_approve_news, reject_news, init_db
+from telebot import apihelper
 import datetime as dt
 
 init_db()
+
+#apihelper.proxy = { 'https': 'socks5h://98.152.200.61:8081'}
+#рабочий прокси, если вдруг будет ошибка задержки тг или что-то типа того
 
 SITE_URL = "http://127.0.0.1:5000/"
 BOT_TOKEN = '7933023765:AAHOHT0AuKPkVDzagc1ZLJLmw196TBJPHXE'
@@ -37,7 +41,6 @@ def receive_news(message):
     bot.send_message(MODERATOR_ID1,
                      f"Новая новость от @{message.from_user.username}:\n\n{message.text}",
                      reply_markup=markup)
-
     global text, au
     au = f"{message.from_user.username}"
     text = f"{message.text}"
