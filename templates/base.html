@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .section-block {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .news-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 150px;
+        }
+        .author-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .search-box {
+            margin: 20px 0;
+        }
+        .comments {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+        .news-item {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .highlighted {
+            background-color: #fff3cd !important;
+            transition: background-color 1s ease;
+        }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .like-btn, .comment-toggle {
+            background: none;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 4px 8px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .like-btn:hover, .comment-toggle:hover {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+    <title>Новостной сайт</title>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="section-block">
+                <h5>Свежие</h5>
+                {% for news in fresh %}
+                <div class="mb-2">
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">@{{ news[1] }}</small>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="section-block">
+                <h5>Закладки</h5>
+                {% for news in popular %}
+                <div class="mb-2">
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">@{{ news[1] }}</small>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="section-block">
+                <h5>Обсуждаемые</h5>
+                {% for news in discussed %}
+                <div class="mb-2">
+                    <a href="#news-{{ news[0] }}" style="text-decoration: none;">
+                        <h6>{{ news[2] }}</h6>
+                        <small class="text-muted">💬 {{ news[5] }}</small>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <form class="search-box">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Поиск по новостям..." name="q"
+                   value="{{ search_query }}">
+            <button class="btn btn-outline-secondary" type="submit">Найти</button>
+        </div>
+    </form>
+
+    {% for news in all_news %}
+    <div class="news-item" id="news-{{ news[0] }}">
+        <h3>{{ news[2] }}</h3>
+
+        <div class="meta-row">
+            <div class="action-buttons">
+                <form action="/bookmark/{{ news[0] }}" method="POST" class="inline-form">
+                    <button type="submit" class="like-btn">🔖 В закладки</button>
+                </form>
+
+                <button class="comment-toggle" onclick="toggleComments({{ news[0] }})">
+                    💬 {{ get_comments(news[0])|length }}
+                </button>
+            </div>
+
+            <div class="author-info">
+                Автор: <strong>@{{ news[1] }}</strong>
+                <span class="text-muted" style="font-size: 0.9em;"> | ⏰ {{ news[4] }}</span>
+            </div>
+        </div>
+
+        <div class="comments" id="comments-{{ news[0] }}" style="display: none;">
+            {% for comment in get_comments(news[0]) %}
+            <div class="comment">
+                <p>{{ comment[2] }}</p>
+            </div>
+            {% endfor %}
+
+            <form action="/comment/{{ news[0] }}" method="POST">
+                <input type="text" name="comment" placeholder="Ваш комментарий..." required>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleComments(newsId) {
+        const commentsDiv = document.getElementById(`comments-${newsId}`);
+        if (commentsDiv) {
+            commentsDiv.style.display = commentsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    window.onload = function () {
+        const hash = window.location.hash;
+        if (hash.startsWith("#news-")) {
+            const target = document.querySelector(hash);
+            if (target) {
+                target.classList.add("highlighted");
+                setTimeout(() => target.classList.remove("highlighted"), 2000);
+                target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    };
+</script>
+</body>
+</html>
