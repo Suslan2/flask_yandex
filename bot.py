@@ -12,7 +12,7 @@ init_db()
 
 SITE_URL = "http://127.0.0.1:5000/"
 BOT_TOKEN = '7933023765:AAHOHT0AuKPkVDzagc1ZLJLmw196TBJPHXE'
-MODERATOR_ID = 1874487891
+MODERATOR_ID = 1874487891 #id для модератора можно узнать в боте @ID_Extractor_Bot, остальных закомментировать
 MODERATOR_ID1 = 1775908002
 
 bot = telebot.TeleBot(BOT_TOKEN)
